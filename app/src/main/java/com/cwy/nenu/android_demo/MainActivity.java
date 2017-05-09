@@ -7,56 +7,59 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import org.json.JSONObject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText editText = (EditText) findViewById(R.id.test);
-    Button button = (Button) findViewById(R.id.doTest);
-    TextView textView = (TextView) findViewById(R.id.result);
+    EditText editText;
+    Button button;
+    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        editText = (EditText) findViewById(R.id.test);
+        button = (Button) findViewById(R.id.doTest);
+        textView = (TextView) findViewById(R.id.result);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.v("MyTag","onClick");
-                getTest();
+                String baseUrl = "http://192.168.1.188:8080";
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(baseUrl)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .build();
+
+                TestService testService = retrofit.create(TestService.class);
+                Call<Object> call = testService.test(editText.getText().toString());
+                call.enqueue(new Callback<Object>() {
+                    @Override
+                    public void onResponse(Call<Object> call, Response<Object> response) {
+                        textView.setText(response.body().toString());
+                    }
+
+                    @Override
+                    public void onFailure(Call<Object> call, Throwable t) {
+                        textView.setText(t.getMessage());
+                    }
+
+                });
             }
         });
+
     }
 
-    //test request
-    private void getTest(){
-        String baseUrl = "http://localhost:8080";
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        TestService testService = retrofit.create(TestService.class);
-        Call<JSONObject> call = testService.test(editText.getText().toString());
-        call.enqueue(new Callback<JSONObject>() {
-            @Override
-            public void onResponse(Call<JSONObject> call, Response<JSONObject> response) {
-                textView.setText(response.body().toString());
-            }
-
-            @Override
-            public void onFailure(Call<JSONObject> call, Throwable t) {
-                textView.setText(t.getMessage());
-            }
-
-        });
-    }
 
 }
