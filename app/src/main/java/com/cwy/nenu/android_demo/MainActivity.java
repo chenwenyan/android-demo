@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     EditText editText;
     Button button;
     TextView textView;
+    Button serverRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         editText = (EditText) findViewById(R.id.test);
         button = (Button) findViewById(R.id.doTest);
+        serverRequest = (Button) findViewById(R.id.serverRequest);
         textView = (TextView) findViewById(R.id.result);
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -56,6 +59,14 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 });
+            }
+        });
+
+        serverRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(),"点击",Toast.LENGTH_LONG).show();
+                textView.setText(editText.getText().toString());
             }
         });
 
